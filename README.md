@@ -1,13 +1,13 @@
 # arti-ssh Proxy Agent
 
 **arti-ssh-proxy**는 Go 언어로 작성된 경량 서버 에이전트입니다.  
-`ssh.artgrammer.co.kr` 웹 허브와 보안 WebSocket(WSS)으로 연결되어, 웹 브라우저에서 대상 서버의 쉘(Bash/Zsh)에 직접 접근할 수 있게 해줍니다.
+`your-domain.com` 웹 허브와 보안 WebSocket(WSS)으로 연결되어, 웹 브라우저에서 대상 서버의 쉘(Bash/Zsh)에 직접 접근할 수 있게 해줍니다.
 
 ## 📌 아키텍처 (Architecture)
 
 ```mermaid
 graph LR
-    User[Web Client] --HTTPS--> Hub[ssh.artgrammer.co.kr]
+    User[Web Client] --HTTPS--> Hub[your-domain.com]
     Hub --WSS (Secure WebSocket)--> Agent[arti-ssh-proxy]
     Agent --PTY (Local Shell)--> Shell[Bash/Zsh]
 ```
@@ -43,6 +43,23 @@ GOOS=linux GOARCH=amd64 go build -o arti-ssh-agent ./cmd/agent
 # Linux ARM64
 GOOS=linux GOARCH=arm64 go build -o arti-ssh-agent ./cmd/agent
 ```
+
+## 🔄 CI/CD 및 릴리스 (Release)
+
+GitHub Actions를 통해 태그가 푸시될 때 자동으로 빌드 및 릴리스가 생성됩니다.
+
+### 릴리스 절차
+
+1. 코드를 커밋하고 푸시합니다.
+2. `v`로 시작하는 태그를 생성하고 푸시합니다.
+   ```bash
+   git tag v0.0.1
+   git push origin v0.0.1
+   ```
+3. GitHub Actions가 자동으로 다음 작업을 수행합니다:
+   - Linux x86_64 빌드
+   - Linux ARM64 빌드
+   - GitHub Releases 페이지에 바이너리 업로드
 
 ## ⚡ 자동 설치 (Automated Install)
 
@@ -99,7 +116,7 @@ Group=ec2-user
 
 # 실제 연결할 웹소켓 URL로 수정하세요. 
 # 예: 토큰이 필요한 경우 ?token=XYZ 추가
-ExecStart=/usr/local/bin/arti-ssh-agent -url wss://ssh.artgrammer.co.kr/ws
+ExecStart=/usr/local/bin/arti-ssh-agent -url wss://your-domain.com/ws
 
 # 비정상 종료 시 자동 재시작
 Restart=always
@@ -108,6 +125,10 @@ RestartSec=5
 # 로그 출력 설정
 StandardOutput=journal
 StandardError=journal
+
+# 환경 변수로 설정 (Optional)
+# ARTI_SSH_URL 환경 변수를 통해 URL을 설정할 수도 있습니다.
+# Environment=ARTI_SSH_URL=wss://your-domain.com/ws
 
 [Install]
 WantedBy=multi-user.target

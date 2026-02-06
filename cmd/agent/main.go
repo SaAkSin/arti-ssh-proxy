@@ -13,10 +13,23 @@ import (
 )
 
 func main() {
-	serverURL := flag.String("url", "wss://ssh.artgrammer.co.kr/ws", "WebSocket Server URL")
+	var serverURL string
+	
+	// 1. Flag (Highest Priority)
+	flag.StringVar(&serverURL, "url", "", "WebSocket Server URL (overrides env)")
 	flag.Parse()
 
-	log.Printf("Starting Agent. Target: %s", *serverURL)
+	// 2. Env (Middle Priority)
+	if serverURL == "" {
+		serverURL = os.Getenv("ARTI_SSH_URL")
+	}
+
+	// 3. Default (Lowest Priority)
+	if serverURL == "" {
+		serverURL = "ws://localhost:8080/ws"
+	}
+
+	log.Printf("Starting Agent. Target: %s", serverURL)
 
 	// 1. Start PTY
 	ptySvc := pty.NewService()
@@ -49,7 +62,7 @@ func main() {
 	}()
 
 	// 3. Main Connection Loop
-	wsClient := ws.NewClient(*serverURL)
+	wsClient := ws.NewClient(serverURL)
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
