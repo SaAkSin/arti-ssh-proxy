@@ -23,6 +23,7 @@ graph LR
 - **자동 재연결**: 네트워크 단절 시 자동으로 재연결을 시도하여 가용성 확보.
 - **단일 바이너리**: 외부 라이브러리 의존성 없는 정적 바이너리로 배포 용이.
 - **크로스 컴파일**: Linux (x86_64, ARM64) 및 **macOS (Intel, Apple Silicon)** 지원.
+- **스마트 프로토콜 감지**: 주소에 프로토콜이 없을 경우, `localhost`/`127.0.0.1`은 `ws://` (평문), 그 외는 `wss://` (보안)로 자동 설정.
 
 ## 🛠 빌드 방법 (Build)
 
@@ -124,8 +125,8 @@ User=ec2-user
 Group=ec2-user
 
 # 실제 연결할 웹소켓 URL로 수정하세요. 
-# 예: 토큰이 필요한 경우 ?token=XYZ 추가
-ExecStart=/usr/local/bin/arti-ssh-agent -url wss://your-domain.com/ws
+# 스키마(ws://, wss://)를 생략하면 localhost는 ws://, 그 외에는 wss://가 자동 적용됩니다.
+ExecStart=/usr/local/bin/arti-ssh-agent -url your-domain.com/ws
 
 # 비정상 종료 시 자동 재시작
 Restart=always

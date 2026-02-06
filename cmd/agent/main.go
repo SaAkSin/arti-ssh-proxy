@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -27,6 +28,15 @@ func main() {
 	// 3. Default (Lowest Priority)
 	if serverURL == "" {
 		serverURL = "ws://localhost:8080/ws"
+	}
+
+	// 4. Normalize URL Scheme
+	if !strings.HasPrefix(serverURL, "ws://") && !strings.HasPrefix(serverURL, "wss://") {
+		if strings.Contains(serverURL, "localhost") || strings.Contains(serverURL, "127.0.0.1") {
+			serverURL = "ws://" + serverURL
+		} else {
+			serverURL = "wss://" + serverURL
+		}
 	}
 
 	log.Printf("Starting Agent. Target: %s", serverURL)
