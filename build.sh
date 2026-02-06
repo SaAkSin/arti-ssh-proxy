@@ -2,11 +2,19 @@
 
 # Build for Linux x86_64
 echo "Building for Linux amd64..."
-GOOS=linux GOARCH=amd64 go build -o bin/arti-ssh-agent-amd64 ./cmd/agent
+GOOS=linux GOARCH=amd64 go build -o bin/arti-ssh-agent-linux-amd64 ./cmd/agent
 
 # Build for Linux ARM64
 echo "Building for Linux arm64..."
-GOOS=linux GOARCH=arm64 go build -o bin/arti-ssh-agent-arm64 ./cmd/agent
+GOOS=linux GOARCH=arm64 go build -o bin/arti-ssh-agent-linux-arm64 ./cmd/agent
+
+# Build for macOS Intel
+echo "Building for macOS amd64..."
+GOOS=darwin GOARCH=amd64 go build -o bin/arti-ssh-agent-darwin-amd64 ./cmd/agent
+
+# Build for macOS Apple Silicon
+echo "Building for macOS arm64..."
+GOOS=darwin GOARCH=arm64 go build -o bin/arti-ssh-agent-darwin-arm64 ./cmd/agent
 
 echo "Build complete. Binaries are in ./bin/"
 ls -lh ./bin/

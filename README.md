@@ -22,7 +22,7 @@ graph LR
 - **PTY 지원**: `creack/pty`를 이용한 완전한 터미널 에뮬레이션 지원 (Vim, Top 등 사용 가능).
 - **자동 재연결**: 네트워크 단절 시 자동으로 재연결을 시도하여 가용성 확보.
 - **단일 바이너리**: 외부 라이브러리 의존성 없는 정적 바이너리로 배포 용이.
-- **크로스 컴파일**: Linux x86_64 및 ARM64 지원.
+- **크로스 컴파일**: Linux (x86_64, ARM64) 및 **macOS (Intel, Apple Silicon)** 지원.
 
 ## 🛠 빌드 방법 (Build)
 
@@ -33,15 +33,24 @@ Go 1.23 이상이 필요합니다. 포함된 `build.sh`를 사용하거나 직�
 chmod +x build.sh
 ./build.sh
 ```
-`bin/` 디렉토리에 `arti-ssh-agent-amd64` (x86_64)와 `arti-ssh-agent-arm64` (ARM)가 생성됩니다.
+`bin/` 디렉토리에 다음 파일들이 생성됩니다:
+- `arti-ssh-agent-linux-amd64` / `arti-ssh-agent-linux-arm64`
+- `arti-ssh-agent-darwin-amd64` (Intel Mac)
+- `arti-ssh-agent-darwin-arm64` (Apple Silicon Mac)
 
 ### 수동 빌드
 ```bash
 # Linux x86_64
-GOOS=linux GOARCH=amd64 go build -o arti-ssh-agent ./cmd/agent
+GOOS=linux GOARCH=amd64 go build -o arti-ssh-agent-linux-amd64 ./cmd/agent
 
 # Linux ARM64
-GOOS=linux GOARCH=arm64 go build -o arti-ssh-agent ./cmd/agent
+GOOS=linux GOARCH=arm64 go build -o arti-ssh-agent-linux-arm64 ./cmd/agent
+
+# macOS Intel
+GOOS=darwin GOARCH=amd64 go build -o arti-ssh-agent-darwin-amd64 ./cmd/agent
+
+# macOS Apple Silicon
+GOOS=darwin GOARCH=arm64 go build -o arti-ssh-agent-darwin-arm64 ./cmd/agent
 ```
 
 ## 🔄 CI/CD 및 릴리스 (Release)
@@ -57,8 +66,8 @@ GitHub Actions를 통해 태그가 푸시될 때 자동으로 빌드 및 릴리�
    git push origin v0.0.1
    ```
 3. GitHub Actions가 자동으로 다음 작업을 수행합니다:
-   - Linux x86_64 빌드
-   - Linux ARM64 빌드
+   - Linux (amd64, arm64) 빌드
+   - macOS (amd64, arm64) 빌드
    - GitHub Releases 페이지에 바이너리 업로드
 
 ## ⚡ 자동 설치 (Automated Install)

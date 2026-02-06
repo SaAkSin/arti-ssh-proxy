@@ -10,23 +10,34 @@ SERVICE_NAME="arti-ssh"
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 
-if [ "$OS" != "linux" ]; then
-    echo "Error: Only Linux is supported."
+if [ "$OS" != "linux" ] && [ "$OS" != "darwin" ]; then
+    echo "Error: Only Linux and macOS are supported."
     exit 1
 fi
 
+case "$OS" in
+    linux)
+        OS_KEY="linux"
+        ;;
+    darwin)
+        OS_KEY="darwin"
+        ;;
+esac
+
 case "$ARCH" in
     x86_64)
-        ASSET_NAME="arti-ssh-agent-linux-amd64"
+        ARCH_KEY="amd64"
         ;;
     aarch64|arm64)
-        ASSET_NAME="arti-ssh-agent-linux-arm64"
+        ARCH_KEY="arm64"
         ;;
     *)
         echo "Error: Unsupported architecture $ARCH"
         exit 1
         ;;
 esac
+
+ASSET_NAME="arti-ssh-agent-${OS_KEY}-${ARCH_KEY}"
 
 # Function to get latest version
 get_latest_version() {
