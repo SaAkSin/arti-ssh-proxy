@@ -44,6 +44,18 @@ GOOS=linux GOARCH=amd64 go build -o arti-ssh-agent ./cmd/agent
 GOOS=linux GOARCH=arm64 go build -o arti-ssh-agent ./cmd/agent
 ```
 
+## ⚡ 자동 설치 (Automated Install)
+
+`curl`을 사용하여 최신 버전을 자동으로 설치할 수 있습니다.
+
+```bash
+# 최신 버전 설치
+curl -sL https://raw.githubusercontent.com/SaAkSin/arti-ssh-proxy/main/install.sh | sudo bash
+
+# 특정 버전 설치 (예: v0.0.1)
+curl -sL https://raw.githubusercontent.com/SaAkSin/arti-ssh-proxy/main/install.sh | sudo bash -s v0.0.1
+```
+
 ---
 
 ## ☁️ 배포 및 설정 가이드 (Amazon Linux 2023 / Rocky Linux 9)
