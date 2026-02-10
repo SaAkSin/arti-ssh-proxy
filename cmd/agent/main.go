@@ -104,7 +104,7 @@ func main() {
 					if !ok {
 						return // PTY closed
 					}
-					if err := wsClient.WriteBinary(data); err != nil {
+					if err := wsClient.WriteData(data); err != nil {
 						log.Printf("WS Write Error: %v", err)
 						return
 					}

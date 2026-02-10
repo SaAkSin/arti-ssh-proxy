@@ -28,6 +28,9 @@ func (s *Service) Start() (*os.File, error) {
 
 	c := exec.Command(shell)
 	
+	// Set TERM to support PTY behavior
+	c.Env = append(os.Environ(), "TERM=xterm")
+	
 	// Create PTY
 	f, err := pty.Start(c)
 	if err != nil {

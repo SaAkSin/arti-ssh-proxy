@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"log"
 	"net/http"
 	"os"
@@ -22,37 +21,29 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 	log.Println("Agent connected!")
 
-	// Send 'date\n' to agent automatically to verify execution
-	c.WriteMessage(websocket.BinaryMessage, []byte("date\n"))
+	// Send 'date\n' to agent automatically as Text Message
+	c.WriteMessage(websocket.TextMessage, []byte("date\n"))
 
 	// WS -> Stdout
 	go func() {
+		defer c.Close()
 		for {
-			_, message, err := c.ReadMessage()
+			mt, message, err := c.ReadMessage()
 			if err != nil {
 				log.Println("read:", err)
-				break
+				return
 			}
+			log.Printf("Recv Type: %d, Payload: %s", mt, string(message))
 			os.Stdout.Write(message)
 		}
 	}()
 
-	// Stdin -> WS
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		text := scanner.Text()
-		// Send as binary (pty input)
-		// Add newline because scanner strips it
-		err := c.WriteMessage(websocket.BinaryMessage, []byte(text+"\n"))
-		if err != nil {
-			log.Println("write:", err)
-			break
-		}
-	}
+	// Keep alive
+	select {}
 }
 
 func main() {
-	log.Println("Starting Mock Server on :8080/ws")
+	log.Println("Starting Mock Server on :8081/ws")
 	http.HandleFunc("/ws", echo)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
