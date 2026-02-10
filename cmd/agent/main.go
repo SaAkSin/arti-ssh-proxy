@@ -17,7 +17,7 @@ import (
 
 func main() {
 	var serverURL string
-	
+
 	// 1. Flag (Highest Priority)
 	flag.StringVar(&serverURL, "url", "", "WebSocket Server URL (overrides env)")
 	flag.Parse()
@@ -77,7 +77,7 @@ func main() {
 			}
 			data := make([]byte, n)
 			copy(data, buf[:n])
-			
+
 			select {
 			case ptyOutput <- data:
 			case <-ctx.Done():
@@ -88,7 +88,12 @@ func main() {
 
 	// 3. Main Connection Loop
 	wsClient := ws.NewClient(serverURL)
-	defer wsClient.Close() // Ensure WS is closed on exit
+	// Ensure WS is closed on exit or context cancellation
+	go func() {
+		<-ctx.Done()
+		wsClient.Close()
+	}()
+	defer wsClient.Close()
 
 	// Loop until context is cancelled
 	for {
@@ -129,7 +134,7 @@ func main() {
 					if err := wsClient.WriteData(data); err != nil {
 						log.Printf("WS Write Error: %v", err)
 						// Close connection to trigger ReadLoop exit and reconnection
-						wsClient.Close() 
+						wsClient.Close()
 						return
 					}
 				case <-stopWriter:
@@ -154,9 +159,9 @@ func main() {
 				ptySvc.Resize(rows, cols)
 			},
 		)
-		
+
 		log.Printf("Disconnected: %v", err)
-		
+
 		// Cleanup current session
 		close(stopWriter)
 		wsClient.Close()

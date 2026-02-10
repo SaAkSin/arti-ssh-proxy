@@ -44,7 +44,7 @@ func (c *Client) Connect() error {
 	if err != nil {
 		return err
 	}
-	
+
 	c.conn = conn
 	return nil
 }
@@ -111,6 +111,11 @@ func (c *Client) ReadLoop(onData func([]byte), onResize func(uint16, uint16)) er
 					onData([]byte(msg.Data))
 				}
 				continue
+			} else {
+				// Log why it failed to parse as JSON, but only if it looks like JSON
+				if len(p) > 0 && p[0] == '{' {
+					log.Printf("Failed to parse JSON control message: %v. Raw: %s", err, string(p))
+				}
 			}
 
 			// Failure to parse JSON means it's data (input)
