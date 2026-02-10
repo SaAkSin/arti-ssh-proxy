@@ -15,6 +15,7 @@ type ControlMessage struct {
 	Type string `json:"type"`
 	Rows uint16 `json:"rows,omitempty"`
 	Cols uint16 `json:"cols,omitempty"`
+	Data string `json:"data,omitempty"` // Add Data field for input payload
 }
 
 // Client handles the WebSocket connection
@@ -105,6 +106,9 @@ func (c *Client) ReadLoop(onData func([]byte), onResize func(uint16, uint16)) er
 				// It's a valid control message
 				if msg.Type == "resize" && onResize != nil {
 					onResize(msg.Rows, msg.Cols)
+				} else if msg.Type == "input" && onData != nil {
+					// Handle input message from gateway
+					onData([]byte(msg.Data))
 				}
 				continue
 			}
